@@ -650,20 +650,40 @@
             box-shadow: 0 0 10px #ff3333;
         }
         .hidden-button {
-            border: none;
-            border-radius: 50%; /* Круглая кнопка */
-            width: 40px;
-            height: 40px;
-            position: fixed; /* Фиксированное позиционирование */
-            bottom: 10px; /* Отступ снизу */
-            left: 10px; /* Отступ слева */
-            cursor: pointer;
-            z-index: 1000; /* Поверх других элементов */
-        }
-        
-        .hidden-button:hover {
-            background-color: #333; /* Темно-серый при наведении */
-        }
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    position: fixed;
+    bottom: 10px;
+    left: 10px;
+    cursor: pointer;
+    z-index: 1000;
+    background: rgba(255, 204, 0, 0.2);
+    color: #ffcc00;
+    border: 1px solid #ffcc00;
+}
+
+.hidden-button1 {
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    position: fixed;
+    bottom: 10px;
+    left: 60px; /* 10px + 40px + 10px отступа */
+    cursor: pointer;
+    z-index: 1000;
+    background: rgba(255, 204, 0, 0.2);
+    color: #ffcc00;
+    border: 1px solid #ffcc00;
+}
+
+.hidden-button:hover,
+.hidden-button1:hover {
+    background-color: #ffcc00;
+    color: #000;
+}
     </style>
 </head>
 <body>
@@ -917,6 +937,11 @@
 <!-- Скрытая кнопка в левом нижнем углу -->
     <button class="hidden-button" onclick="window.location.href='reset.html'" title="Секретная кнопка">
         <i class="fas fa-lock"></i>
+    </button>
+    
+    <!-- Скрытая кнопка в левом нижнем углу -->
+    <button class="hidden-button1" onclick="window.location.href='Event1.html'" title="Мультирежим">
+        <i class="fas fa-random"></i>
     </button>
 
     <!-- Футер -->
