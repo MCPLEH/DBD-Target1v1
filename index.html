@@ -649,6 +649,21 @@
             color: #000;
             box-shadow: 0 0 10px #ff3333;
         }
+        .hidden-button {
+            border: none;
+            border-radius: 50%; /* Круглая кнопка */
+            width: 40px;
+            height: 40px;
+            position: fixed; /* Фиксированное позиционирование */
+            bottom: 10px; /* Отступ снизу */
+            left: 10px; /* Отступ слева */
+            cursor: pointer;
+            z-index: 1000; /* Поверх других элементов */
+        }
+        
+        .hidden-button:hover {
+            background-color: #333; /* Темно-серый при наведении */
+        }
     </style>
 </head>
 <body>
@@ -667,7 +682,7 @@
     <div class="modal-overlay hidden" id="alreadyRegisteredModal">
         <div class="modal-content">
             <h2 class="modal-title">Внимание!</h2>
-            <p class="modal-text">Вы уже отправляли свою анкету на регистрацию. Если вам нужно изменить данные или у вас возникли проблемы, свяжитесь с администратором.</p>
+            <p class="modal-text">Вы уже регистрировались с этого устройства. Если вам нужно изменить данные или у вас возникли проблемы, свяжитесь с организатором.</p>
             <div class="modal-buttons">
                 <button class="modal-btn admin" id="contactAdminBtn">Связаться</button>
                 <button class="modal-btn" id="backToMenuBtn">Назад</button>
@@ -702,7 +717,7 @@
         <!-- Добавляем обработчик клика на заголовок -->
         <h1 class="menu-title glitch-text" data-text="ТУРНИР 1V1 Царь Горы" id="tournamentTitle">ТУРНИР 1V1 Царь Горы</h1>
         <div class="menu-buttons">
-            <button class="menu-btn" id="participantsBtn">Зарегистрированные участники</button>
+            <button class="menu-btn" id="participantsBtn">Участники</button>
             <button class="menu-btn" id="registrationBtn">Регистрация</button>
             <button class="menu-btn" id="infoBtn">Информация о турнире</button>
             <button class="menu-btn" id="rulesBtn">Правила</button>
@@ -898,6 +913,11 @@
             </div>
         </div>
     </div>
+
+<!-- Скрытая кнопка в левом нижнем углу -->
+    <button class="hidden-button" onclick="window.location.href='reset.html'" title="Секретная кнопка">
+        <i class="fas fa-lock"></i>
+    </button>
 
     <!-- Футер -->
     <br>
