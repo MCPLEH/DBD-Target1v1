@@ -577,6 +577,78 @@
             border-color: #ff0000;
             box-shadow: 0 0 15px #ff0000;
         }
+
+        /* Модальное окно для повторной регистрации */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 2000;
+        }
+
+        .modal-content {
+            background-color: #000;
+            border: 2px solid #ffcc00;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            box-shadow: 0 0 30px #ffcc00;
+        }
+
+        .modal-title {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #ffcc00;
+            text-transform: uppercase;
+        }
+
+        .modal-text {
+            margin-bottom: 30px;
+            line-height: 1.5;
+        }
+
+        .modal-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .modal-btn {
+            background-color: transparent;
+            color: #ffcc00;
+            border: 2px solid #ffcc00;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            min-width: 150px;
+        }
+
+        .modal-btn:hover {
+            background-color: #ffcc00;
+            color: #000;
+            box-shadow: 0 0 10px #ffcc00;
+        }
+
+        .modal-btn.admin {
+            border-color: #ff3333;
+            color: #ff3333;
+        }
+
+        .modal-btn.admin:hover {
+            background-color: #ff3333;
+            color: #000;
+            box-shadow: 0 0 10px #ff3333;
+        }
     </style>
 </head>
 <body>
@@ -590,6 +662,18 @@
 
     <!-- Уведомления -->
     <div class="notification" id="notification"></div>
+
+    <!-- Модальное окно для повторной регистрации -->
+    <div class="modal-overlay hidden" id="alreadyRegisteredModal">
+        <div class="modal-content">
+            <h2 class="modal-title">Внимание!</h2>
+            <p class="modal-text">Вы уже отправляли свою анкету на регистрацию. Если вам нужно изменить данные или у вас возникли проблемы, свяжитесь с администратором.</p>
+            <div class="modal-buttons">
+                <button class="modal-btn admin" id="contactAdminBtn">Связаться</button>
+                <button class="modal-btn" id="backToMenuBtn">Назад</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Главная страница -->
     <div class="container main-page" id="mainPage">
@@ -874,6 +958,7 @@
         const rulesPage = document.getElementById('rulesPage');
         const notification = document.getElementById('notification');
         const tournamentTitle = document.getElementById('tournamentTitle');
+        const alreadyRegisteredModal = document.getElementById('alreadyRegisteredModal');
         
         const startBtn = document.getElementById('startBtn');
         const participantsBtn = document.getElementById('participantsBtn');
@@ -891,10 +976,15 @@
         const closeCard = document.getElementById('closeCard');
         
         const submitRegistration = document.getElementById('submitRegistration');
+        const contactAdminBtn = document.getElementById('contactAdminBtn');
+        const backToMenuBtn = document.getElementById('backToMenuBtn');
         
         // Настройки Telegram бота
         const TELEGRAM_BOT_TOKEN = '7648746510:AAECKk-hOAIMd1_eQZItO8X69lQgKNl6Eoo';
         const TELEGRAM_CHAT_ID = '-1003486777426';
+        
+        // Ключ для хранения информации о регистрации в localStorage
+        const REGISTRATION_KEY = 'dbd_tournament_registered';
 
         // Функции навигации
         function showPage(page) {
@@ -909,6 +999,11 @@
             if (page === participantsPage) {
                 updateParticipantsList();
             }
+            
+            // Если показываем регистрацию, проверяем не зарегистрирован ли уже пользователь
+            if (page === registrationPage) {
+                checkIfAlreadyRegistered();
+            }
         }
         
         function showLoadingTransition(callback) {
@@ -917,6 +1012,28 @@
                 loadingScreen.classList.add('hidden');
                 if (callback) callback();
             }, 1500);
+        }
+        
+        // Проверка, зарегистрирован ли уже пользователь
+        function checkIfAlreadyRegistered() {
+            const isRegistered = localStorage.getItem(REGISTRATION_KEY);
+            if (isRegistered === 'true') {
+                // Показываем модальное окно вместо формы регистрации
+                registrationPage.classList.add('hidden');
+                alreadyRegisteredModal.classList.remove('hidden');
+                return true;
+            }
+            return false;
+        }
+        
+        // Показать модальное окно о повторной регистрации
+        function showAlreadyRegisteredModal() {
+            alreadyRegisteredModal.classList.remove('hidden');
+        }
+        
+        // Скрыть модальное окно о повторной регистрации
+        function hideAlreadyRegisteredModal() {
+            alreadyRegisteredModal.classList.add('hidden');
         }
         
         function updateParticipantsList() {
@@ -1034,6 +1151,17 @@
             participantCard.style.display = 'none';
         });
         
+        // Обработчики для модального окна
+        contactAdminBtn.addEventListener('click', () => {
+            // Переход по ссылке на администратора (можно изменить на нужную ссылку)
+            window.open('https://t.me/TARGET1v1', '_blank');
+        });
+        
+        backToMenuBtn.addEventListener('click', () => {
+            hideAlreadyRegisteredModal();
+            showLoadingTransition(() => showPage(menuPage));
+        });
+        
         // ДОБАВЛЯЕМ ОБРАБОТЧИК ДЛЯ ОБНОВЛЕНИЯ СТРАНИЦЫ
         tournamentTitle.addEventListener('click', () => {
             location.reload();
@@ -1084,6 +1212,9 @@
             if (result.success) {
                 showNotification(result.message, true);
                 
+                // Сохраняем информацию о регистрации в localStorage
+                localStorage.setItem(REGISTRATION_KEY, 'true');
+                
                 // Добавляем участника в локальный список
                 const newParticipant = {
                     id: participants.length + 1,
@@ -1121,6 +1252,35 @@
                 showPage(mainPage);
             }, 2000);
         });
+        // Блокировка контекстного меню (правой кнопки мыши)
+document.addEventListener('contextmenu', function(e) {
+    e.preventDefault();
+    showNotification('Контекстное меню отключено', false);
+});
+
+// Блокировка F12 и Ctrl+U
+document.addEventListener('keydown', function(e) {
+    // F12
+    if (e.keyCode === 123) {
+        e.preventDefault();
+        showNotification('Функция отключена', false);
+        return false;
+    }
+    
+    // Ctrl+U
+    if (e.ctrlKey && e.keyCode === 85) {
+        e.preventDefault();
+        showNotification('Просмотр исходного кода отключен', false);
+        return false;
+    }
+    
+    // Ctrl+Shift+I, Ctrl+Shift+J, Ctrl+Shift+C
+    if (e.ctrlKey && e.shiftKey && (e.keyCode === 73 || e.keyCode === 74 || e.keyCode === 67)) {
+        e.preventDefault();
+        showNotification('Инструменты разработчика отключены', false);
+        return false;
+    }
+});
     </script>
 </body>
 </html>
