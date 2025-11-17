@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Telegram Group Chat</title>
+    <link rel="icon" href="https://i.postimg.cc/hj2L0k2Q/target1v1.png" type="image/x-icon">
+    <!-- Добавляем Font Awesome для иконок -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Courier New', monospace;
+        }
+
+        body {
+            background-color: #000;
+            background-image: 
+                linear-gradient(rgba(0, 0, 0, 0.9), rgba(0, 0, 0, 0.9)),
+                url('https://framerusercontent.com/images/mnSJcLrRsxC3x00UuNuqZAtE.gif');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #ff003c;
+            overflow-x: hidden;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* Киберпанк сетка */
+        .cyber-grid {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: 
+                linear-gradient(rgba(255, 0, 60, 0.1) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 0, 60, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            z-index: -1;
+            opacity: 0.3;
+        }
+
+        /* Анимированные линии */
+        .scan-line {
+            position: fixed;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #ff003c, transparent);
+            z-index: -1;
+            animation: scan 3s linear infinite;
+        }
+
+        @keyframes scan {
+            0% { top: 0%; opacity: 0; }
+            50% { opacity: 1; }
+            100% { top: 100%; opacity: 0; }
+        }
+
+        /* Кнопка домой */
+        .home-button {
+            display: block;
+            margin: 20px auto;
+            background: linear-gradient(135deg, #1a0010, #33001a);
+            color: #ff003c;
+            border: 2px solid #ff003c;
+            padding: 12px 25px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            z-index: 1000;
+            box-shadow: 0 0 10px rgba(255, 0, 60, 0.5);
+            text-shadow: 0 0 5px #ff003c;
+            border-radius: 5px;
+            max-width: 200px;
+        }
+
+        .home-button:hover {
+            background: linear-gradient(135deg, #33001a, #4d0026);
+            color: #ff3366;
+            box-shadow: 0 0 15px #ff003c;
+            text-shadow: 0 0 10px #ff3366;
+        }
+
+        /* Контейнер чата */
+        .chat-container {
+            max-width: 800px;
+            margin: 50px auto 20px;
+            background: linear-gradient(135deg, rgba(26, 0, 16, 0.9), rgba(51, 0, 26, 0.9));
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(255, 0, 60, 0.3);
+            overflow: hidden;
+            border: 2px solid #ff003c;
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, rgba(255, 0, 60, 0.8), rgba(255, 51, 102, 0.8));
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-bottom: 2px solid #ff003c;
+        }
+
+        .chat-header h1 {
+            font-size: 24px;
+            margin-bottom: 5px;
+            text-shadow: 0 0 10px #ff003c;
+        }
+
+        .user-panel {
+            background: linear-gradient(135deg, rgba(26, 0, 16, 0.7), rgba(51, 0, 26, 0.7));
+            padding: 15px 20px;
+            border-bottom: 1px solid #ff003c;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .user-panel input {
+            padding: 8px 12px;
+            background: linear-gradient(135deg, #1a0010, #33001a);
+            border: 1px solid #ff003c;
+            color: #ff003c;
+            border-radius: 5px;
+            font-size: 14px;
+            width: 200px;
+            box-shadow: 0 0 5px rgba(255, 0, 60, 0.3);
+        }
+
+        .user-panel input:focus {
+            outline: none;
+            border-color: #ff3366;
+            box-shadow: 0 0 10px #ff003c;
+        }
+
+        .apply-button {
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #1a0010, #33001a);
+            color: #ff003c;
+            border: 2px solid #ff003c;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 0 10px rgba(255, 0, 60, 0.5);
+            text-shadow: 0 0 5px #ff003c;
+            transition: all 0.3s;
+        }
+
+        .apply-button:hover {
+            background: linear-gradient(135deg, #33001a, #4d0026);
+            color: #ff3366;
+            box-shadow: 0 0 15px #ff003c;
+            text-shadow: 0 0 10px #ff3366;
+        }
+
+        .apply-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            border-color: #666;
+            color: #666;
+            box-shadow: none;
+            text-shadow: none;
+        }
+
+        .nickname-display {
+            margin-left: auto;
+            font-weight: bold;
+            color: #ff003c;
+            text-shadow: 0 0 5px #ff003c;
+        }
+
+        .connection-status {
+            text-align: center;
+            padding: 10px;
+            font-size: 14px;
+            background: linear-gradient(135deg, rgba(26, 0, 16, 0.7), rgba(51, 0, 26, 0.7));
+            border-bottom: 1px solid #ff003c;
+        }
+
+        .status-connected {
+            color: #00ff00;
+            text-shadow: 0 0 5px #00ff00;
+        }
+
+        .status-disconnected {
+            color: #ff0000;
+            text-shadow: 0 0 5px #ff0000;
+        }
+
+        .chat-messages {
+            height: 400px;
+            overflow-y: auto;
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(26, 0, 16, 0.7), rgba(51, 0, 26, 0.7));
+        }
+
+        /* Стили для скроллбара */
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .chat-messages::-webkit-scrollbar-track {
+            background: #1a0010;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: #ff003c;
+            border-radius: 3px;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            max-width: 80%;
+            word-wrap: break-word;
+            animation: messageSlide 0.3s ease-out;
+        }
+
+        .message.web {
+            background: linear-gradient(135deg, rgba(0, 255, 0, 0.2), rgba(0, 255, 0, 0.05));
+            border-left: 4px solid #00ff00;
+            margin-left: auto;
+            border: 1px solid #00ff00;
+        }
+
+        .message.system {
+            background: linear-gradient(135deg, rgba(255, 0, 60, 0.2), rgba(255, 0, 60, 0.05));
+            border-left: 4px solid #ff003c;
+            margin: 0 auto;
+            max-width: 90%;
+            text-align: center;
+            border: 1px solid #ff003c;
+        }
+
+        .message-header {
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 14px;
+        }
+
+        .message.web .message-header {
+            color: #00ff00;
+            text-shadow: 0 0 5px #00ff00;
+        }
+
+        .message.system .message-header {
+            color: #ffffff;
+            text-shadow: 0 0 5px #ffffff;
+        }
+
+        .message-text {
+            line-height: 1.4;
+        }
+
+        .message.system .message-text {
+            color: #ffffff;
+        }
+
+        .message-time {
+            font-size: 11px;
+            color: #ff6699;
+            text-align: right;
+            margin-top: 5px;
+        }
+
+        .chat-input-container {
+            padding: 20px;
+            background: linear-gradient(135deg, rgba(26, 0, 16, 0.7), rgba(51, 0, 26, 0.7));
+            border-top: 1px solid #ff003c;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        #messageInput {
+            flex: 1;
+            padding: 12px 16px;
+            background: linear-gradient(135deg, #1a0010, #33001a);
+            border: 2px solid #ff003c;
+            color: #ff003c;
+            border-radius: 25px;
+            font-size: 16px;
+            outline: none;
+            transition: border-color 0.3s;
+            box-shadow: 0 0 5px rgba(255, 0, 60, 0.3);
+        }
+
+        #messageInput:focus {
+            border-color: #ff3366;
+            box-shadow: 0 0 10px #ff003c;
+        }
+
+        #sendButton {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #1a0010, #33001a);
+            color: #ff003c;
+            border: 2px solid #ff003c;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 0 10px rgba(255, 0, 60, 0.5);
+            text-shadow: 0 0 5px #ff003c;
+        }
+
+        #sendButton:hover {
+            background: linear-gradient(135deg, #33001a, #4d0026);
+            color: #ff3366;
+            box-shadow: 0 0 15px #ff003c;
+            text-shadow: 0 0 10px #ff3366;
+            transform: translateY(-2px);
+        }
+
+        #sendButton:active {
+            transform: translateY(0);
+        }
+
+        #sendButton:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+            border-color: #666;
+            color: #666;
+            box-shadow: none;
+            text-shadow: none;
+        }
+
+        /* Анимация для новых сообщений */
+        @keyframes messageSlide {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+
+            .chat-container {
+                margin: 20px auto 10px;
+            }
+
+            .chat-messages {
+                height: 300px;
+            }
+
+            .message {
+                max-width: 90%;
+            }
+
+            .input-group {
+                flex-direction: column;
+            }
+
+            #sendButton {
+                border-radius: 12px;
+            }
+
+            .user-panel {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .user-panel input {
+                width: 100%;
+            }
+
+            .nickname-display {
+                margin-left: 0;
+                margin-top: 10px;
+                text-align: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Киберпанк сетка -->
+    <div class="cyber-grid"></div>
+    
+    <!-- Анимированные линии -->
+    <div class="scan-line" style="animation-delay: 0s;"></div>
+    <div class="scan-line" style="animation-delay: 1s;"></div>
+    <div class="scan-line" style="animation-delay: 2s;"></div>
+
+    <div class="chat-container">
+        <div class="chat-header">
+            <h1>💬 Поддержка PHG</h1>
+        </div>
+
+        <div class="user-panel">
+            <label for="userNickname">Ваш ник:</label>
+            <input type="text" id="userNickname" placeholder="Введите ваш ник..." autocomplete="off">
+            <button class="apply-button" id="applyNickname">Применить</button>
+            <div class="nickname-display" id="nicknameDisplay"></div>
+        </div>
+
+        <div class="connection-status">
+            <span id="statusText" class="status-connected">● Онлайн</span>
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+            <!-- Сообщения будут добавляться здесь -->
+        </div>
+
+        <div class="chat-input-container">
+            <div class="input-group">
+                <input type="text" id="messageInput" placeholder="Сначала установите ник" autocomplete="off" disabled>
+                <button id="sendButton" onclick="sendMessage()" disabled>Отправить</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Кнопка домой -->
+    <button class="home-button" onclick="window.location.href='index.html'">
+        <i class="fas fa-home"></i> Домой
+    </button>
+
+    <script>
+        // ════════════════════════════════════════════════════════════════════════
+        // НАСТРОЙКИ - ЗАПОЛНИТЕ ЭТИ ДАННЫЕ
+        // ════════════════════════════════════════════════════════════════════════
+
+        const BOT_CONFIG = {
+            // Токен вашего бота Telegram (получите у @BotFather)
+            token: '7648746510:AAECKk-hOAIMd1_eQZItO8X69lQgKNl6Eoo',
+            
+            // ID вашей группы Telegram (начинается с -100)
+            chatId: '-1003486777426'
+        };
+
+        // ════════════════════════════════════════════════════════════════════════
+        // КОНЕЦ НАСТРОЕК
+        // ════════════════════════════════════════════════════════════════════════
+
+        // Элементы DOM
+        const chatMessages = document.getElementById('chatMessages');
+        const messageInput = document.getElementById('messageInput');
+        const statusText = document.getElementById('statusText');
+        const sendButton = document.getElementById('sendButton');
+        const userNicknameInput = document.getElementById('userNickname');
+        const applyNicknameButton = document.getElementById('applyNickname');
+        const nicknameDisplay = document.getElementById('nicknameDisplay');
+
+        // Текущий ник пользователя
+        let currentNickname = '';
+
+        // Инициализация чата
+        function initializeChat() {
+            // Добавляем системное сообщение с задержкой
+            setTimeout(addSystemMessage, 800);
+            
+            // Фокус на поле ника
+            userNicknameInput.focus();
+            
+            // Обработчики для поля ника
+            userNicknameInput.addEventListener('input', updateApplyButton);
+            userNicknameInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    applyNickname();
+                }
+            });
+
+            // Обработчик для кнопки Применить
+            applyNicknameButton.addEventListener('click', applyNickname);
+
+            // Обработчики для поля сообщения
+            messageInput.addEventListener('input', updateSendButtonState);
+            messageInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+        }
+
+        // Добавление системного сообщения
+        function addSystemMessage() {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message system';
+            
+            const timeString = new Date().toLocaleTimeString('ru-RU', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            messageDiv.innerHTML = `
+                <div class="message-header">💡 Важная информация</div>
+                <div class="message-text">
+                    <strong>Это односторонний чат поддержки!</strong><br><br>
+                    📝 <strong>Вы можете:</strong><br>
+                    • Оставить сообщение с описанием проблемы<br>
+                    • Указать контакты для связи<br>
+                    • Закрыть чат после отправки<br><br>
+                    ⏳ <strong>Что дальше:</strong><br>
+                    • Ожидайте, когда с вами свяжутся<br>
+                    • Или найдите другие способы связи для более быстрого ответа<br><br>
+                    🔄 <strong>Ответы здесь не приходят</strong> - это только форма для обращений
+                </div>
+                <div class="message-time">${timeString}</div>
+            `;
+
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Обновление состояния кнопки Применить
+        function updateApplyButton() {
+            const hasNickname = userNicknameInput.value.trim().length > 0;
+            applyNicknameButton.disabled = !hasNickname;
+        }
+
+        // Применение ника
+        function applyNickname() {
+            const nickname = userNicknameInput.value.trim();
+            if (nickname) {
+                currentNickname = nickname;
+                nicknameDisplay.textContent = `Текущий ник: ${currentNickname}`;
+                messageInput.disabled = false;
+                messageInput.placeholder = "Опишите вашу проблему и укажите контакты для связи...";
+                messageInput.focus();
+                updateSendButtonState();
+                
+                // Блокируем поле ника после применения
+                userNicknameInput.disabled = true;
+                applyNicknameButton.disabled = true;
+                applyNicknameButton.textContent = "✓ Применен";
+                applyNicknameButton.style.background = "#6c757d";
+            }
+        }
+
+        // Обновление состояния кнопки отправки
+        function updateSendButtonState() {
+            const hasMessage = messageInput.value.trim().length > 0;
+            sendButton.disabled = !(currentNickname && hasMessage);
+        }
+
+        // Функция для добавления сообщения в чат
+        function addMessage(text, timestamp = new Date()) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message web';
+            
+            const timeString = timestamp.toLocaleTimeString('ru-RU', {
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+
+            messageDiv.innerHTML = `
+                <div class="message-header">${currentNickname}</div>
+                <div class="message-text">${text}</div>
+                <div class="message-time">${timeString}</div>
+            `;
+
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+
+        // Функция отправки сообщения в Telegram
+        async function sendMessageToTelegram(text) {
+            const url = `https://api.telegram.org/bot${BOT_CONFIG.token}/sendMessage`;
+            
+            // Форматируем сообщение: Ник: сообщение
+            const formattedMessage = `${currentNickname}: ${text}`;
+            
+            const response = await fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    chat_id: BOT_CONFIG.chatId,
+                    text: formattedMessage
+                })
+            });
+
+            const result = await response.json();
+            
+            if (!result.ok) {
+                throw new Error(result.description || 'Ошибка отправки');
+            }
+
+            return result;
+        }
+
+        // Основная функция отправки сообщения
+        async function sendMessage() {
+            const text = messageInput.value.trim();
+            
+            if (!text || !currentNickname) {
+                return;
+            }
+
+            // Блокируем кнопку на время отправки
+            const originalText = sendButton.textContent;
+            sendButton.disabled = true;
+            sendButton.textContent = 'Отправка...';
+            messageInput.disabled = true;
+
+            try {
+                // Показываем сообщение локально сразу
+                addMessage(text);
+                
+                // Отправляем в Telegram в формате "Ник: сообщение"
+                await sendMessageToTelegram(text);
+                
+                messageInput.value = '';
+                
+                // Добавляем сообщение об успешной отправке
+                const successDiv = document.createElement('div');
+                successDiv.className = 'message system';
+                successDiv.innerHTML = `
+                    <div class="message-header">✅ Сообщение отправлено</div>
+                    <div class="message-text">
+                        Ваше обращение получено! Ожидайте связи с вами.<br>
+                        Вы можете закрыть эту страницу.
+                    </div>
+                    <div class="message-time">${new Date().toLocaleTimeString('ru-RU', {hour: '2-digit', minute: '2-digit'})}</div>
+                `;
+                chatMessages.appendChild(successDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                
+            } catch (error) {
+                console.error('Ошибка отправки:', error);
+                
+                // Удаляем локальное сообщение при ошибке
+                const messages = chatMessages.querySelectorAll('.message');
+                if (messages.length > 0) {
+                    chatMessages.removeChild(messages[messages.length - 1]);
+                }
+                
+                // Показываем ошибку на короткое время
+                statusText.textContent = '● Ошибка отправки';
+                statusText.className = 'status-disconnected';
+                setTimeout(() => {
+                    statusText.textContent = '● Онлайн';
+                    statusText.className = 'status-connected';
+                }, 3000);
+            } finally {
+                // Разблокируем кнопку
+                sendButton.disabled = false;
+                sendButton.textContent = originalText;
+                messageInput.disabled = false;
+                updateSendButtonState();
+                messageInput.focus();
+            }
+        }
+
+        // Инициализация при загрузке
+        document.addEventListener('DOMContentLoaded', initializeChat);
+    </script>
+</body>
+</html>
